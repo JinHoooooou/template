@@ -5,6 +5,7 @@ public interface Message {
   // HTTP Status
   String CREATED = "새로운 리소스가 생성되었습니다.";
   String BAD_REQUEST = "요청이 유효하지 않습니다. 다시 한번 확인해 주세요.";
+  String CONFLICT = "이미 존재하는 리소스입니다.";
 
   // 회원 가입 API
   String INVALID_USER_ID = "영문 대소문자 4자 이상 8자 이하이어야 합니다.";
