@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.project.portfolio.global.constants.Message;
 import org.project.portfolio.global.constants.RegExp;
+import org.project.portfolio.user.entity.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Builder
 @Data
@@ -25,4 +27,13 @@ public class SignUpRequestDto {
   @Pattern(regexp = RegExp.PHONE, message = Message.INVALID_PHONE)
   private String phone;
 
+  public User toEntity(PasswordEncoder passwordEncoder) {
+    return User.builder()
+        .userId(this.userId)
+        .password(passwordEncoder.encode(this.password))
+        .username(this.username)
+        .email(this.email)
+        .phone(this.phone)
+        .build();
+  }
 }

@@ -12,4 +12,7 @@ public interface Message {
   String INVALID_USERNAME = "한글 2자 이상 5자 이하이어야 합니다.";
   String INVALID_EMAIL = "유효하지 않은 이메일 형식입니다.";
   String INVALID_PHONE = "유효하지 않은 휴대폰 번호 형식입니다. (예: 010-1234-5678)";
+  String DUPLICATE_EMAIL = "이미 등록된 이메일입니다.";
+  String DUPLICATE_USER_ID = "이미 등록된 아이디입니다.";
+
 }
