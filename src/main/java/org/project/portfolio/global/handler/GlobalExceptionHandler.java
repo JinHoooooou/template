@@ -1,8 +1,9 @@
-package org.project.portfolio.global.exception;
+package org.project.portfolio.global.handler;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.project.portfolio.global.constants.Message;
+import org.project.portfolio.global.exception.DuplicateResourceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
