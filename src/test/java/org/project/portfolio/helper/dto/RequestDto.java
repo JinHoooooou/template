@@ -1,5 +1,6 @@
 package org.project.portfolio.helper.dto;
 
+import org.project.portfolio.article.dto.ArticleCreateRequestDto;
 import org.project.portfolio.auth.dto.LoginRequestDto;
 import org.project.portfolio.user.dto.SignUpRequestDto;
 
@@ -19,6 +20,13 @@ public class RequestDto {
     return LoginRequestDto.builder()
         .email("test@test.kr")
         .password("q1w2e3r4t5!@")
+        .build();
+  }
+
+  public static ArticleCreateRequestDto validArticleCreateRequestDto() {
+    return ArticleCreateRequestDto.builder()
+        .title("test title")
+        .contents("test contents")
         .build();
   }
 }

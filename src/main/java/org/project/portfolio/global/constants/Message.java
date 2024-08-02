@@ -26,4 +26,7 @@ public interface Message {
   String ALREADY_LOGIN = "이미 로그인되어 있습니다.";
   String NOT_MATCH_WITH_LOGIN_DTO = "이메일 또는 비밀번호가 일치하지 않습니다.";
 
+  // 게시글 등록 API
+  String INVALID_TITLE = "제목은 1자 이상 200자 이하이어야 합니다.";
+  String INVALID_CONTENTS = "내용은 1자 이상 2000자 이하이어야 합니다.";
 }
