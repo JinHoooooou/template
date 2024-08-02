@@ -24,6 +24,7 @@ public interface Message {
   // 인증/인가
   String ONLY_SUPPORTED_APPLICATION_JSON = "'application/json' 형식의 데이터만 지원합니다. 확인해주세요.";
   String ALREADY_LOGIN = "이미 로그인되어 있습니다.";
+  String NOT_LOGGED_IN = "로그인 후 이용해주세요.";
   String NOT_MATCH_WITH_LOGIN_DTO = "이메일 또는 비밀번호가 일치하지 않습니다.";
 
   // 게시글 등록 API

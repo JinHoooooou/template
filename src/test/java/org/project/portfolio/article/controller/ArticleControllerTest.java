@@ -99,6 +99,24 @@ public class ArticleControllerTest {
     resultActions.andExpect(jsonPath("$.details.contents", is(Message.INVALID_CONTENTS)));
   }
 
+  @Test
+  @DisplayName("로그인 상태가 아닐 때, 401 Unauthorized를 응답해야한다.")
+  public void fail_onNotLogin_shouldReturn401Unauthorized() throws Exception {
+    // Given: 유효한 ArticleCreateRequestDto가 주어진다.
+    ArticleCreateRequestDto validArticleCreateRequestDto = RequestDto.validArticleCreateRequestDto();
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
+
+    // When: Create Article API를 호출한다.
+    ResultActions resultActions = callApiWith(validArticleCreateRequestDto, "invalidAccessToken");
+
+    // Then: Status는 401이다.
+    resultActions.andExpect(status().isUnauthorized());
+    // And: Response Body로 message와 detail을 반환한다.
+    resultActions.andExpect(jsonPath("$.message", is(Message.UNAUTHORIZED)));
+    resultActions.andExpect(jsonPath("$.detail", is(Message.NOT_LOGGED_IN)));
+  }
+
   private void mockJwtService() {
     LoginRequestDto validLoginRequestDto = RequestDto.validLoginRequestDto();
     when(jwtService.extractAccessToken(any()))
