@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.hc.client5.http.classic.methods.HttpHead;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.project.portfolio.PortfolioApplication;
 import org.project.portfolio.auth.dto.LoginRequestDto;
 import org.project.portfolio.auth.dto.LoginResponseDto;
-import org.project.portfolio.global.config.SecurityConfig;
 import org.project.portfolio.global.constants.Message;
 import org.project.portfolio.helper.dto.RequestDto;
 import org.project.portfolio.user.entity.User;
@@ -22,18 +20,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(classes = PortfolioApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@Import(SecurityConfig.class)
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class LoginApiTest {
 

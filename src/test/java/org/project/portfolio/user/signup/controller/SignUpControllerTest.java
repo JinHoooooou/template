@@ -1,10 +1,13 @@
 package org.project.portfolio.user.signup.controller;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.project.portfolio.auth.service.AuthService;
@@ -45,6 +48,8 @@ public class SignUpControllerTest {
   public void success_onValidSignUpRequestDto_shouldReturn201Created() throws Exception {
     // Given: 유효한 SignUpRequestDto가 주어진다.
     SignUpRequestDto validSignUpRequestDto = RequestDto.validSignUpRequestDto();
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
 
     // When: SignUp API를 호출한다.
     ResultActions resultActions = callApiWith(validSignUpRequestDto);
@@ -61,6 +66,8 @@ public class SignUpControllerTest {
     // Given: 유효하지 않은 userId가 주어진다.
     SignUpRequestDto invalidSignUpRequestDto = RequestDto.validSignUpRequestDto();
     invalidSignUpRequestDto.setUserId("invalid23");
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
 
     // When: SignUp API를 호출한다.
     ResultActions resultActions = callApiWith(invalidSignUpRequestDto);
@@ -78,6 +85,8 @@ public class SignUpControllerTest {
     // Given: 유효하지 않은 password가 주어진다.
     SignUpRequestDto invalidSignUpRequestDto = RequestDto.validSignUpRequestDto();
     invalidSignUpRequestDto.setPassword("q1w2e3r4!");
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
 
     // When: SignUp API를 호출한다.
     ResultActions resultActions = callApiWith(invalidSignUpRequestDto);
@@ -95,6 +104,8 @@ public class SignUpControllerTest {
     // Given: 유효하지 않은 username가 주어진다.
     SignUpRequestDto invalidSignUpRequestDto = RequestDto.validSignUpRequestDto();
     invalidSignUpRequestDto.setUsername("ㅈㅎ");
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
 
     // When: SignUp API를 호출한다.
     ResultActions resultActions = callApiWith(invalidSignUpRequestDto);
@@ -112,6 +123,8 @@ public class SignUpControllerTest {
     // Given: 유효하지 않은 email이 주어진다.
     SignUpRequestDto invalidSignUpRequestDto = RequestDto.validSignUpRequestDto();
     invalidSignUpRequestDto.setEmail("jinho@na");
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
 
     // When: SignUp API를 호출한다.
     ResultActions resultActions = callApiWith(invalidSignUpRequestDto);
@@ -129,6 +142,8 @@ public class SignUpControllerTest {
     // Given: 유효하지 않은 phone이 주어진다.
     SignUpRequestDto invalidSignUpRequestDto = RequestDto.validSignUpRequestDto();
     invalidSignUpRequestDto.setPhone("01012345678");
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
 
     // When: SignUp API를 호출한다.
     ResultActions resultActions = callApiWith(invalidSignUpRequestDto);
@@ -150,6 +165,8 @@ public class SignUpControllerTest {
     invalidSignUpRequestDto.setUsername("ㅈㅎ");
     invalidSignUpRequestDto.setEmail("jinho@na");
     invalidSignUpRequestDto.setPhone("01012345678");
+    // Mocking
+    doThrow(new JwtException("JWT Exception")).when(jwtService).validate(any());
 
     // When: SignUp API를 호출한다.
     ResultActions resultActions = callApiWith(invalidSignUpRequestDto);
@@ -163,6 +180,22 @@ public class SignUpControllerTest {
     resultActions.andExpect(jsonPath("$.details.username", is(Message.INVALID_USERNAME)));
     resultActions.andExpect(jsonPath("$.details.email", is(Message.INVALID_EMAIL)));
     resultActions.andExpect(jsonPath("$.details.phone", is(Message.INVALID_PHONE)));
+  }
+
+  @Test
+  @DisplayName("이미 로그인 상태일 때, 403 Forbidden을 응답해야한다.")
+  public void fail_onAlreadyLogin_shouldReturn403Forbidden() throws Exception {
+    // Given: 유효한 SignUpRequestDto가 주어진다.
+    SignUpRequestDto validSignUpRequestDto = RequestDto.validSignUpRequestDto();
+
+    // When: SignUp API를 호출한다.
+    ResultActions resultActions = callApiWith(validSignUpRequestDto);
+
+    // Then: Status는 403이다.
+    resultActions.andExpect(status().isForbidden());
+    // And: Response Body로 message와 details를 반환한다.
+    resultActions.andExpect(jsonPath("$.message", is(Message.FORBIDDEN)));
+    resultActions.andExpect(jsonPath("$.detail", is(Message.ALREADY_LOGIN)));
   }
 
   private ResultActions callApiWith(SignUpRequestDto signUpRequestDto) throws Exception {

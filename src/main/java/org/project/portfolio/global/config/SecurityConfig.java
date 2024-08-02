@@ -10,6 +10,7 @@ import org.project.portfolio.auth.service.AuthService;
 import org.project.portfolio.auth.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,10 +44,31 @@ public class SecurityConfig {
 
     httpSecurity.headers(frame -> frame.frameOptions(FrameOptionsConfig::sameOrigin));
 
+    httpSecurity.authorizeHttpRequests(requests -> requests
+        .requestMatchers(HttpMethod.POST, "/api/v1/articles").authenticated()
+        .requestMatchers(HttpMethod.POST, "/api/v1/signup", "/api/v1/login").anonymous()
+        .anyRequest().permitAll()
+    );
+
+    httpSecurity.exceptionHandling(handler -> handler
+        .authenticationEntryPoint(customAuthenticationEntryPoint())
+        .accessDeniedHandler(customAccessDeniedHandler())
+    );
+
     httpSecurity.addFilterAt(jsonLoginFilter(), UsernamePasswordAuthenticationFilter.class);
     httpSecurity.addFilterBefore(jwtAuthenticationFilter(), JsonLoginFilter.class);
 
     return httpSecurity.build();
+  }
+
+  @Bean
+  public CustomAccessDeniedHandler customAccessDeniedHandler() {
+    return new CustomAccessDeniedHandler();
+  }
+
+  @Bean
+  public CustomAuthenticationEntryPoint customAuthenticationEntryPoint() {
+    return new CustomAuthenticationEntryPoint();
   }
 
   @Bean
