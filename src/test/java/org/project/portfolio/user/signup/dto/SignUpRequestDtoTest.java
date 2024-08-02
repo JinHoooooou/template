@@ -1,4 +1,4 @@
-package org.project.portfolio.user.signup.regexp;
+package org.project.portfolio.user.signup.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
