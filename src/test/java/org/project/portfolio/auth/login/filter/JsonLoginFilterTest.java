@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.project.portfolio.auth.dto.AuthenticatedUser;
 import org.project.portfolio.auth.dto.LoginRequestDto;
 import org.project.portfolio.auth.service.AuthService;
 import org.project.portfolio.global.constants.Message;
@@ -50,10 +51,11 @@ public class JsonLoginFilterTest {
     // Given: 유효한 LoginRequestDto가 주어진다.
     LoginRequestDto validLoginRequestDto = RequestDto.validLoginRequestDto();
     // Mocking
-    User mockUser = new User(
-        validLoginRequestDto.getEmail(),
-        validLoginRequestDto.getPassword(),
-        Collections.singleton(new SimpleGrantedAuthority("USER"))
+    AuthenticatedUser mockUser = new AuthenticatedUser(
+        org.project.portfolio.user.entity.User.builder()
+            .email(validLoginRequestDto.getEmail())
+            .password(validLoginRequestDto.getPassword())
+            .build()
     );
     when(authService.loadUserByUsername(validLoginRequestDto.getEmail())).thenReturn(mockUser);
     when(passwordEncoder.matches(any(), any())).thenReturn(true);
@@ -88,6 +90,49 @@ public class JsonLoginFilterTest {
   }
 
   @Test
+  @DisplayName("email에 대한 리소스가 없을 때, 401 Unauthorized를 응답해야한다.")
+  public void fail_onNoResourceWithEmail_shouldReturn401Unauthorized() throws Exception {
+    // Given: 유효한 LoginRequestDto가 주어진다.
+    LoginRequestDto validLoginRequestDto = RequestDto.validLoginRequestDto();
+    // Mocking
+    when(authService.loadUserByUsername(validLoginRequestDto.getEmail()))
+        .thenThrow(new UsernameNotFoundException(Message.NOT_MATCH_WITH_LOGIN_DTO));
+
+    // When: Login API를 호출한다.
+    ResultActions resultActions = callApiWith(validLoginRequestDto, MediaType.APPLICATION_JSON);
+
+    // Then: Status는 401 Unauthorized이다.
+    resultActions.andExpect(status().isUnauthorized());
+    // And: Response Body로 message와 detail을 반환한다.
+    resultActions.andExpect(jsonPath("$.message", is(Message.UNAUTHORIZED)));
+    resultActions.andExpect(jsonPath("$.detail", is(Message.NOT_MATCH_WITH_LOGIN_DTO)));
+  }
+
+  @Test
+  @DisplayName("password가 리소스와 일치하지 않을 때, 401 Unauthroized를 응답해야한다.")
+  public void fail_onNotEqualsPasswordWithResource_shouldReturn401Unauthorized() throws Exception {
+    // Given: 유효한 LoginRequestDto가 주어진다.
+    LoginRequestDto validLoginRequestDto = RequestDto.validLoginRequestDto();
+    validLoginRequestDto.setPassword("q1w2e3r4t5!!");
+    // Mocking
+    User mockUser = new User(
+        validLoginRequestDto.getEmail(),
+        "q1w2e3r4t5!@",
+        Collections.singleton(new SimpleGrantedAuthority("USER"))
+    );
+    when(authService.loadUserByUsername(validLoginRequestDto.getEmail())).thenReturn(mockUser);
+    when(passwordEncoder.matches(any(), any())).thenReturn(false);
+
+    // When: Login API를 호출한다.
+    ResultActions resultActions = callApiWith(validLoginRequestDto, MediaType.APPLICATION_JSON);
+
+    // Then: Status는 401 Unauthorized이다.
+    resultActions.andExpect(status().isUnauthorized());
+    // And: Response Body로 message와 detail을 반환한다.
+    resultActions.andExpect(jsonPath("$.message", is(Message.UNAUTHORIZED)));
+  }
+
+  @Test
   @DisplayName("이미 로그인되어 있을 때, 403 Forbidden을 응답해야한다.")
   public void fail_onAlreadyLogin_shouldReturn403Forbidden() throws Exception {
     // Given: 유효한 LoginRequestDto가 주어진다.
@@ -109,25 +154,6 @@ public class JsonLoginFilterTest {
     // And: Response Body로 message와 detail을 반환한다.
     resultActions.andExpect(jsonPath("$.message", is(Message.FORBIDDEN)));
     resultActions.andExpect(jsonPath("$.detail", containsString(Message.ALREADY_LOGIN)));
-  }
-
-  @Test
-  @DisplayName("email에 대한 리소스가 없을 때, 404 Not Found를 응답해야한다.")
-  public void fail_onNoResourceWithEmail_shouldReturn404NotFound() throws Exception {
-    // Given: 유효한 LoginRequestDto가 주어진다.
-    LoginRequestDto validLoginRequestDto = RequestDto.validLoginRequestDto();
-    // Mocking
-    when(authService.loadUserByUsername(validLoginRequestDto.getEmail()))
-        .thenThrow(new UsernameNotFoundException(Message.NOT_FOUND_EMAIL));
-
-    // When: Login API를 호출한다.
-    ResultActions resultActions = callApiWith(validLoginRequestDto, MediaType.APPLICATION_JSON);
-
-    // Then: Status는 404 Not Found이다.
-    resultActions.andExpect(status().isNotFound());
-    // And: Response Body로 message와 detail을 반환한다.
-    resultActions.andExpect(jsonPath("$.message", is(Message.NOT_FOUND)));
-    resultActions.andExpect(jsonPath("$.detail", containsString(Message.NOT_FOUND_EMAIL)));
   }
 
   @Test

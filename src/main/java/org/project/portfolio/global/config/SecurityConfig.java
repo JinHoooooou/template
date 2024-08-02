@@ -3,9 +3,11 @@ package org.project.portfolio.global.config;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.project.portfolio.auth.filter.JsonLoginFilter;
+import org.project.portfolio.auth.filter.JwtAuthenticationFilter;
 import org.project.portfolio.auth.handler.JsonLoginFailureHandler;
 import org.project.portfolio.auth.handler.JsonLoginSuccessHandler;
 import org.project.portfolio.auth.service.AuthService;
+import org.project.portfolio.auth.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +30,7 @@ public class SecurityConfig {
 
   private final Validator validator;
   private final AuthService authService;
+  private final JwtService jwtService;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -38,6 +41,7 @@ public class SecurityConfig {
     httpSecurity.headers(frame -> frame.frameOptions(FrameOptionsConfig::sameOrigin));
 
     httpSecurity.addFilterAt(jsonLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+    httpSecurity.addFilterBefore(jwtAuthenticationFilter(), JsonLoginFilter.class);
 
     return httpSecurity.build();
   }
@@ -52,14 +56,13 @@ public class SecurityConfig {
     DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
     authenticationProvider.setUserDetailsService(authService);
     authenticationProvider.setPasswordEncoder(passwordEncoder());
-    authenticationProvider.setHideUserNotFoundExceptions(false);
 
     return new ProviderManager(authenticationProvider);
   }
 
   @Bean
   public JsonLoginSuccessHandler jsonLoginSuccessHandler() {
-    return new JsonLoginSuccessHandler();
+    return new JsonLoginSuccessHandler(jwtService);
   }
 
   @Bean
@@ -75,5 +78,9 @@ public class SecurityConfig {
     jsonLoginFilter.setAuthenticationFailureHandler(jsonLoginFailureHandler());
 
     return jsonLoginFilter;
+  }
+
+  private JwtAuthenticationFilter jwtAuthenticationFilter() {
+    return new JwtAuthenticationFilter(jwtService);
   }
 }
