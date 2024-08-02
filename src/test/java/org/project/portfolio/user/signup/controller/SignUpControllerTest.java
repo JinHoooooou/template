@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.project.portfolio.auth.service.AuthService;
+import org.project.portfolio.auth.service.JwtService;
 import org.project.portfolio.global.config.SecurityConfig;
 import org.project.portfolio.global.constants.Message;
 import org.project.portfolio.helper.dto.RequestDto;
@@ -33,6 +35,10 @@ public class SignUpControllerTest {
   private MockMvc mockMvc;
   @MockBean
   private SignUpService signUpService;
+  @MockBean
+  private AuthService authService;
+  @MockBean
+  private JwtService jwtService;
 
   @Test
   @DisplayName("SignUpRequestDto의 필드가 모두 유효할 때, 201 Created를 응답해야한다.")
