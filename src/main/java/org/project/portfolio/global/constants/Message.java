@@ -31,4 +31,5 @@ public interface Message {
   // 게시글 등록 API
   String INVALID_TITLE = "제목은 1자 이상 200자 이하이어야 합니다.";
   String INVALID_CONTENTS = "내용은 1자 이상 2000자 이하이어야 합니다.";
+  String SUCCESS_CREATE = "새 게시글을 등록했습니다.";
 }

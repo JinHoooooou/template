@@ -23,4 +23,11 @@ public class ArticleCreateRequestDto {
   @Size(min = 1, max = 1000, message = Message.INVALID_CONTENTS)
   private String contents;
 
+  public Article toEntity(User writer) {
+    return Article.builder()
+        .writer(writer)
+        .title(this.title)
+        .contents(this.contents)
+        .build();
+  }
 }
