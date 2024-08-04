@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.project.portfolio.article.entity.Article;
 import org.project.portfolio.global.constants.Message;
+import org.project.portfolio.user.entity.User;
 
 @Data
 @Builder
